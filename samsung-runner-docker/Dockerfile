@@ -44,6 +44,16 @@ RUN useradd -m runner && \
 RUN mkdir -p /opt/ndk && \
     chown -R runner:runner /opt/ndk $CONDA_DIR
 
+# Install Android NDK r28c (required by Samsung build)
+ENV ANDROID_NDK_VERSION=r28c
+ENV ANDROID_NDK_ROOT=/opt/ndk
+RUN cd /tmp && \
+    wget -q https://ossci-android.s3.amazonaws.com/android-ndk-${ANDROID_NDK_VERSION}-linux.zip && \
+    unzip -q android-ndk-${ANDROID_NDK_VERSION}-linux.zip && \
+    mv android-ndk-${ANDROID_NDK_VERSION}/* /opt/ndk/ && \
+    rm android-ndk-${ANDROID_NDK_VERSION}-linux.zip && \
+    rm -rf android-ndk-${ANDROID_NDK_VERSION}
+
 # Switch to runner user
 USER runner
 WORKDIR /home/runner
