@@ -21,8 +21,9 @@ jobs:
       - name: Update submodules
         shell: bash
         run: |
+          rm -rf third-party/json
           git submodule sync --recursive
-          git submodule update --init --recursive
+          git submodule update --init --recursive --force
 
       - name: Run Test Script
         shell: bash
