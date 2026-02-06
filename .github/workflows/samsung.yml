@@ -46,7 +46,7 @@ jobs:
           # This is critical because our runner has no CUDA, but standard linux wheels expect it.
           pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
 
-          PYTHON_EXECUTABLE=python bash .ci/scripts/setup-linux.sh --build-tool "cmake" runner
+          PYTHON_EXECUTABLE=python bash .ci/scripts/setup-linux.sh --build-tool "cmake"
           # The generic Linux job chooses to use base env, not the one setup by the image
           # Using stricter check to avoid failure if jq/conda missing in bare runner
           if command -v conda >/dev/null 2>&1; then
