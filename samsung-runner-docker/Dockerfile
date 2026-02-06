@@ -22,11 +22,12 @@ RUN add-apt-repository ppa:deadsnakes/ppa && \
     apt-get install -y python3.10 python3.10-dev python3.10-venv python3-pip && \
     ln -s /usr/bin/python3.10 /usr/bin/python
 
-# Install Miniconda (as preferred by Executorch)
+# Install Miniforge (to avoid Anaconda ToS issues)
 ENV CONDA_DIR=/opt/conda
-RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh && \
-    bash miniconda.sh -b -p $CONDA_DIR && \
-    rm miniconda.sh
+RUN wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh -O miniforge.sh && \
+    bash miniforge.sh -b -p $CONDA_DIR && \
+    rm miniforge.sh
+ENV PATH=$CONDA_DIR/bin:$PATH
 
 # Create a Python 3.10 environment called 'executorch'
 RUN $CONDA_DIR/bin/conda create -y -n executorch python=3.10 pip
