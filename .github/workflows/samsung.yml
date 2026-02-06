@@ -45,6 +45,10 @@ jobs:
           fi
 
           # Setup python
+          echo "Checking cmake version..."
+          which cmake
+          cmake --version
+
           PYTHON_EXECUTABLE=python bash .ci/scripts/setup-linux.sh --build-tool "cmake"
 
           # Setup Samsung SDK (AI Lite Core) and install enn backend
