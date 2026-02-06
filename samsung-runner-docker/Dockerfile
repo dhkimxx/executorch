@@ -27,7 +27,12 @@ ENV CONDA_DIR=/opt/conda
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh && \
     bash miniconda.sh -b -p $CONDA_DIR && \
     rm miniconda.sh
-ENV PATH=$CONDA_DIR/bin:$PATH
+
+# Create a Python 3.10 environment called 'executorch'
+RUN $CONDA_DIR/bin/conda create -y -n executorch python=3.10 pip
+
+# Set the new environment as default in PATH
+ENV PATH=$CONDA_DIR/envs/executorch/bin:$CONDA_DIR/bin:$PATH
 
 # Create a runner user
 RUN useradd -m runner && \
