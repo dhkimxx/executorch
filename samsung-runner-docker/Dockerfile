@@ -29,8 +29,8 @@ RUN wget https://github.com/conda-forge/miniforge/releases/latest/download/Minif
     rm miniforge.sh
 ENV PATH=$CONDA_DIR/bin:$PATH
 
-# Create a Python 3.10 environment called 'executorch'
-RUN $CONDA_DIR/bin/conda create -y -n executorch python=3.10 pip
+# Create a Python 3.10 environment called 'executorch' with newer cmake (>=3.29 required by pyproject.toml)
+RUN $CONDA_DIR/bin/conda create -y -n executorch python=3.10 pip "cmake>=3.29"
 
 # Set the new environment as default in PATH
 ENV PATH=$CONDA_DIR/envs/executorch/bin:$CONDA_DIR/bin:$PATH
