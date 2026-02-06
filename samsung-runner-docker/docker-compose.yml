@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  samsung-runner:
+    build: .
+    environment:
+      - GITHUB_URL=https://github.com/dhkimxx/executorch
+      - GITHUB_TOKEN=${GITHUB_TOKEN} # Pass this via environment or .env file
+      - RUNNER_NAME=samsung-runner-01
+      - RUNNER_LABELS=samsung-runner
+    volumes:
+      # Persist runner updates and config
+      - runner_data:/home/runner
+    restart: unless-stopped
+
+volumes:
+  runner_data:
