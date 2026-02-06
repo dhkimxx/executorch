@@ -179,4 +179,4 @@ devicefarm_ver="beta-1.0.9"
 download_ai_lite_core ${litecore_ver}
 install_devicefarm_cli "${devicefarm_ver}"
 install_enn_backend
-Enqueue_device_request
+# Enqueue_device_request
