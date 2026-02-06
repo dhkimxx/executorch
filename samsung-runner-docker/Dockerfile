@@ -40,8 +40,9 @@ RUN useradd -m runner && \
     echo "runner ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Create /opt/ndk and give ownership to runner (for setup script)
+# Also give ownership of conda directory to allow pip installs
 RUN mkdir -p /opt/ndk && \
-    chown -R runner:runner /opt/ndk
+    chown -R runner:runner /opt/ndk $CONDA_DIR
 
 # Switch to runner user
 USER runner
