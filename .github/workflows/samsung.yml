@@ -21,7 +21,8 @@ jobs:
       - name: Update submodules
         shell: bash
         run: |
-          rm -rf third-party/json
+          # Force clean critical submodules to avoid shallow clone/detached head issues
+          rm -rf third-party/json third-party/flatbuffers third-party/pybind11 third-party/cpuinfo
           git submodule sync --recursive
           git submodule update --init --recursive --force
 
