@@ -60,7 +60,7 @@ download_and_extract() {
 
   zip)
     echo "Extracting ZIP..."
-    unzip -q -d "${out_dir}" "${out_file}"
+    unzip -qo -d "${out_dir}" "${out_file}"
     ;;
 
   *)
