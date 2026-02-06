@@ -41,6 +41,12 @@ jobs:
           # This fixes the issue where system cmake (3.22) is picked up instead of conda cmake (3.29+)
           export PATH=/opt/conda/envs/executorch/bin:$PATH
 
+          # Setup python
+          # Pre-install CPU-only PyTorch to prevent pip from pulling CUDA-enabled wheels from PyPI
+          # This is critical because our runner has no CUDA, but standard linux wheels expect it.
+          pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+
+          PYTHON_EXECUTABLE=python bash .ci/scripts/setup-linux.sh --build-tool "cmake" runner
           # The generic Linux job chooses to use base env, not the one setup by the image
           # Using stricter check to avoid failure if jq/conda missing in bare runner
           if command -v conda >/dev/null 2>&1; then
@@ -48,7 +54,6 @@ jobs:
              conda activate "${CONDA_ENV}"
           fi
 
-          # Setup python
           echo "Checking cmake version..."
           which cmake
           cmake --version
