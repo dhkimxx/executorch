@@ -16,8 +16,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: recursive
           fetch-depth: 0
+
+      - name: Update submodules
+        shell: bash
+        run: |
+          git submodule sync --recursive
+          git submodule update --init --recursive
 
       - name: Run Test Script
         shell: bash
