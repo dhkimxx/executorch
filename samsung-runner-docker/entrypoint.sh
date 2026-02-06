@@ -16,8 +16,12 @@ if [ -z "$GITHUB_TOKEN" ]; then
     exit 1
 fi
 
-echo "Configuring GitHub Runner..."
-./config.sh --url "${GITHUB_URL}" --token "${GITHUB_TOKEN}" --name "${RUNNER_NAME}" --labels "${RUNNER_LABELS}" --unattended --replace
+if [ -f ".runner" ]; then
+    echo "Runner already configured. Skipping configuration."
+else
+    echo "Configuring GitHub Runner..."
+    ./config.sh --url "${GITHUB_URL}" --token "${GITHUB_TOKEN}" --name "${RUNNER_NAME}" --labels "${RUNNER_LABELS}" --unattended --replace
+fi
 
 echo "Starting GitHub Runner..."
 ./run.sh
