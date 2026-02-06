@@ -62,16 +62,8 @@ jobs:
 
           # Setup Samsung SDK (AI Lite Core) and install enn backend
           export SAMSUNG_AI_LITECORE_KEY=$SECRET_SAMSUNG_AI_LITECORE_KEY
-          source .ci/scripts/setup-samsung-linux-deps.sh
-
-          # Pass DEVICE_RESERVED to Github Actions ENV for visibility if needed, 
-          # but the script uses local check.
-
-          # Check if device was reserved
-          if [[ "${DEVICE_RESERVED:-0}" != "1" ]]; then
-            echo "::warning::Skipping tests - no Samsung device available"
-            exit 0
-          fi
+          trap 'bash .ci/scripts/cleanup-samsung-linux-deps.sh' EXIT
+          source .ci/scripts/setup-samsung-linux-deps.sh --device-connect false
 
           # Test quant models
           model_scripts="deeplab_v3 edsr inception_v3 inception_v4 mobilenet_v2 mobilenet_v3 resnet18 resnet50 vit wav2letter"
@@ -79,47 +71,48 @@ jobs:
             python -m executorch.examples.samsung.scripts.${m_script} -c e9955 -p A8W8
           done
 
-  # test-samsung-models-linux:
-  #   name: test-samsung-models-linux
-  #   runs-on: [self-hosted, samsung-runner]
-  #   env:
-  #     SECRET_SAMSUNG_AI_LITECORE_KEY: ${{ secrets.SAMSUNG_AI_LITECORE_KEY }}
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-  #       with:
-  #         submodules: recursive
-  #         fetch-depth: 0
+  test-samsung-models-linux:
+    name: test-samsung-models-linux
+    runs-on: [self-hosted, samsung-runner]
+    env:
+      SECRET_SAMSUNG_AI_LITECORE_KEY: ${{ secrets.SAMSUNG_AI_LITECORE_KEY }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
 
-  #     - name: Run Test Script
-  #       shell: bash
-  #       run: |
-  #         set -ex
+      - name: Run Test Script
+        shell: bash
+        run: |
+          set -ex
 
-  #         # Ensure Conda is available in the shell
-  #         if command -v conda >/dev/null 2>&1; then
-  #            # Source conda to make 'activate' work
-  #            source "$(conda info --base)/etc/profile.d/conda.sh"
-  #         fi
+          # Ensure Conda is available in the shell
+          if command -v conda >/dev/null 2>&1; then
+             # Source conda to make 'activate' work
+             source "$(conda info --base)/etc/profile.d/conda.sh"
+          fi
 
-  #         # The generic Linux job chooses to use base env, not the one setup by the image
-  #         if command -v conda >/dev/null 2>&1; then
-  #            CONDA_ENV=$(conda env list --json | jq -r ".envs | .[-1]")
-  #            conda activate "${CONDA_ENV}"
-  #         fi
+          # The generic Linux job chooses to use base env, not the one setup by the image
+          if command -v conda >/dev/null 2>&1; then
+             CONDA_ENV=$(conda env list --json | jq -r ".envs | .[-1]")
+             conda activate "${CONDA_ENV}"
+          fi
 
-  #         # Setup python
-  #         PYTHON_EXECUTABLE=python bash .ci/scripts/setup-linux.sh --build-tool "cmake"
+          # Setup python
+          PYTHON_EXECUTABLE=python bash .ci/scripts/setup-linux.sh --build-tool "cmake"
 
-  #         # Setup Samsung SDK (AI Lite Core) and install enn backend
-  #         export SAMSUNG_AI_LITECORE_KEY=$SECRET_SAMSUNG_AI_LITECORE_KEY
-  #         source .ci/scripts/setup-samsung-linux-deps.sh
+          # Setup Samsung SDK (AI Lite Core) and install enn backend
+          export SAMSUNG_AI_LITECORE_KEY=$SECRET_SAMSUNG_AI_LITECORE_KEY
+          trap 'bash .ci/scripts/cleanup-samsung-linux-deps.sh' EXIT
+          source .ci/scripts/setup-samsung-linux-deps.sh --device-connect true
 
-  #         # Check if device was reserved
-  #         if [[ "${DEVICE_RESERVED:-0}" != "1" ]]; then
-  #           echo "::warning::Skipping tests - no Samsung device available"
-  #           exit 0
-  #         fi
+          # Check if device was reserved
+          if [[ "${DEVICE_RESERVED:-0}" != "1" ]]; then
+            echo "::warning::Skipping tests - no Samsung device available"
+            exit 0
+          fi
 
-  #         # Test models
-  #         python -m unittest discover -s backends/samsung/test/models -p "test_*.py"
+          # Test models
+          python -m unittest discover -s backends/samsung/test/models -p "test_*.py"
