@@ -14,41 +14,29 @@ if [[ -z "${API_KEY}" ]]; then
   exit 1
 fi
 
-OS_NAME="Ubuntu 22.04"
-LITECORE_BASE="https://soc-developer.semiconductor.samsung.com/api/v1/resource/ai-litecore/download"
-DEVICEFARM_BASE="https://soc-developer.semiconductor.samsung.com/api/v1/resource/remotelab/download"
+export DEVICE_CONNECT_ENABLED=1
 
-parse_url() {
-  local json="$1"
-  if command -v jq >/dev/null 2>&1; then
-    jq -r '.data // empty' <<<"$json"
-  else
-    sed -n 's/.*"data":[[:space:]]*"\([^"]*\)".*/\1/p' <<<"$json"
+if [[ "${1:-}" == "--device-connect" ]]; then
+  # check boolean false case (case-insensitive)
+  if [[ "$(echo "$2" | tr '[:upper:]' '[:lower:]')" =~ ^(false|0|off|no)$ ]]; then
+    export DEVICE_CONNECT_ENABLED=0
   fi
-}
+fi
+
+LITECORE_URL="https://soc-developer.semiconductor.samsung.com/api/v1/resource/download-file/exynos-ai-litecore-ubuntu2204-v1.0.0"
+DEVICEFARM_URL="https://soc-developer.semiconductor.samsung.com/api/v1/resource/download-file/devicefarmcli-stg-beta-v0.0.1.zip"
 
 download_and_extract() {
-  local base_url="$1"
-  local version="$2"
-  local out_dir="$3"
-  local out_file="$4"
+  local download_url="$1"
+  local out_dir="$2"
+  local out_file="$3"
 
-  local resp
-  resp=$(curl -fsSL -G \
+  echo "Downloading from ${download_url}..."
+  curl -fsSL --retry 3 \
     -H "apikey: ${API_KEY}" \
-    --data-urlencode "version=${version}" \
-    --data-urlencode "os=${OS_NAME}" \
-    "${base_url}")
+    -o "${out_file}" \
+    "${download_url}"
 
-  local download_url
-  download_url=$(parse_url "$resp")
-  if [[ -z "${download_url}" ]]; then
-    echo "ERROR: It failed to download from ${base_url} ."
-    echo "Response: $resp" >&2
-    exit 1
-  fi
-
-  curl -fsSL -L --retry 3 -o "${out_file}" "${download_url}"
   echo "Download completed: ${out_file}"
 
   mkdir -p "${out_dir}"
@@ -60,7 +48,7 @@ download_and_extract() {
 
   zip)
     echo "Extracting ZIP..."
-    unzip -q -d "${out_dir}" "${out_file}"
+    unzip -qo -d "${out_dir}" "${out_file}"
     ;;
 
   *)
@@ -76,8 +64,7 @@ download_ai_lite_core() {
   local litecore_dir="/tmp/exynos_ai_lite_core"
 
   download_and_extract \
-    "${LITECORE_BASE}" \
-    "${litecore_version}" \
+    "${LITECORE_URL}" \
     "${litecore_dir}" \
     "${litecore_out}"
 
@@ -91,8 +78,7 @@ install_devicefarm_cli() {
   local cli_dir="/tmp/devicefarm_cli"
 
   download_and_extract \
-    "${DEVICEFARM_BASE}" \
-    "${cli_version}" \
+    "${DEVICEFARM_URL}" \
     "${cli_dir}" \
     "${cli_out}"
 
@@ -177,6 +163,11 @@ litecore_ver="1.0"
 devicefarm_ver="beta-1.0.9"
 
 download_ai_lite_core ${litecore_ver}
-install_devicefarm_cli "${devicefarm_ver}"
 install_enn_backend
-Enqueue_device_request
+
+if [[ "${DEVICE_CONNECT_ENABLED}" == "1" ]]; then
+  install_devicefarm_cli "${devicefarm_ver}"
+  Enqueue_device_request
+else
+  export DEVICE_RESERVED=0
+fi
