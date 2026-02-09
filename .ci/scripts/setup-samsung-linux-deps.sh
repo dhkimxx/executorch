@@ -23,16 +23,19 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     *)
-      # Unkown option
+      # Unknown option
       shift
       ;;
   esac
 done
 
 LITECORE_VERSION="v1.0"
+LITECORE_FILE_NAME="ai-litecore-ubuntu2204-${LITECORE_VERSION}.tar.gz"  
 DEVICEFARM_CLI_VERSION="beta-v1.1.0"
-LITECORE_URL="https://soc-developer.semiconductor.samsung.com/api/v1/resource/download-file/ai-litecore-ubuntu2204-${LITECORE_VERSION}.tar.gz"
-DEVICEFARM_URL="https://soc-developer.semiconductor.samsung.com/api/v1/resource/download-file/devicefarmcli-${DEVICEFARM_CLI_VERSION}.zip"
+DEVICEFARM_FILE_NAME="devicefarmcli-${DEVICEFARM_CLI_VERSION}.zip"
+
+LITECORE_URL="https://soc-developer.semiconductor.samsung.com/api/v1/resource/download-file/${LITECORE_FILE_NAME}"
+DEVICEFARM_URL="https://soc-developer.semiconductor.samsung.com/api/v1/resource/download-file/${DEVICEFARM_FILE_NAME}"
 
 download_and_extract() {
   local download_url="$1"
@@ -68,7 +71,7 @@ download_and_extract() {
 
 download_ai_lite_core() {
   local litecore_version="${1:-${LITECORE_VERSION}}"
-  local litecore_out="/tmp/exynos-ai-litecore-v${litecore_version}.tar.gz"
+  local litecore_out="/tmp/${LITECORE_FILE_NAME}"
   local litecore_dir="/tmp/exynos_ai_lite_core"
 
   download_and_extract \
@@ -82,7 +85,7 @@ download_ai_lite_core() {
 
 install_devicefarm_cli() {
   local cli_version="${1:-${DEVICEFARM_CLI_VERSION}}"
-  local cli_out="/tmp/devicefarm-cli-v${cli_version}.zip"
+  local cli_out="/tmp/${DEVICEFARM_FILE_NAME}"
   local cli_dir="/tmp/devicefarm_cli"
 
   download_and_extract \
