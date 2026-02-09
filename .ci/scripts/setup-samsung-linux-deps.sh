@@ -16,12 +16,17 @@ fi
 
 export DEVICE_CONNECT_ENABLED=1
 
-if [[ "${1:-}" == "--device-connect" ]]; then
-  # check boolean false case (case-insensitive)
-  if [[ "$(echo "$2" | tr '[:upper:]' '[:lower:]')" =~ ^(false|0|off|no)$ ]]; then
-    export DEVICE_CONNECT_ENABLED=0
-  fi
-fi
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --device-connect)
+      if [[ "$(echo "$2" | tr '[:upper:]' '[:lower:]')" =~ ^(false|0|off|no)$ ]]; then
+        export DEVICE_CONNECT_ENABLED=0
+      fi
+      shift 2 ;;
+    *)
+      shift ;;
+  esac
+done
 
 LITECORE_URL="https://soc-developer.semiconductor.samsung.com/api/v1/resource/download-file/exynos-ai-litecore-ubuntu2204-v1.0.0"
 DEVICEFARM_URL="https://soc-developer.semiconductor.samsung.com/api/v1/resource/download-file/devicefarmcli-stg-beta-v0.0.1.zip"
@@ -86,8 +91,8 @@ install_devicefarm_cli() {
   chmod +x "${cli_dir}/devicefarm-cli"
 }
 
-Enqueue_device_request() {
-  export DEVICE_RESERVED=0
+acquire_device() {
+  export DEVICE_ACQUIRED=0
   if ! command -v devicefarm-cli >/dev/null 2>&1; then
     echo "[WARN] devicefarm-cli is not installed." >&2
     return 1
@@ -124,7 +129,7 @@ Enqueue_device_request() {
 	echo "$out"
 	# Execute test command
 	devicefarm-cli -E "ls /" || true
-	export DEVICE_RESERVED=1
+	export DEVICE_ACQUIRED=1
 	echo "[INFO] Device successfully assigned and connected."
 	return 0
 	;;
@@ -167,7 +172,7 @@ install_enn_backend
 
 if [[ "${DEVICE_CONNECT_ENABLED}" == "1" ]]; then
   install_devicefarm_cli "${devicefarm_ver}"
-  Enqueue_device_request
+  acquire_device
 else
-  export DEVICE_RESERVED=0
+  export DEVICE_ACQUIRED=0
 fi

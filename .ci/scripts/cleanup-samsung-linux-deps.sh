@@ -6,9 +6,9 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-set +e
+set +ex
 
-if [[ "${DEVICE_RESERVED:-0}" != "1" ]]; then
+if [[ "${DEVICE_ACQUIRED:-0}" != "1" ]]; then
   exit 0
 fi
 
@@ -19,4 +19,5 @@ fi
 
 echo "[INFO] Disconnecting device (-d)..."
 devicefarm-cli -d || echo "::warning::Device disconnect failed (ignored)"
-set -e
+
+set -ex
