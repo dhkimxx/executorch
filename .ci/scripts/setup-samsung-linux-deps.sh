@@ -29,10 +29,10 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-LITECORE_URL="https://soc-developer.semiconductor.samsung.com/api/v1/resource/download-file/exynos-ai-litecore-ubuntu2204-v1.0.0"
-DEVICEFARM_URL="https://soc-developer.semiconductor.samsung.com/api/v1/resource/download-file/devicefarmcli-stg-beta-v0.0.1.zip"
-LITECORE_VERSION="1.0"
-DEVICEFARM_CLI_VERSION="beta-1.0.9"
+LITECORE_VERSION="v1.0"
+DEVICEFARM_CLI_VERSION="stg-beta-v0.0.1"
+LITECORE_URL="https://soc-developer.semiconductor.samsung.com/api/v1/resource/download-file/ai-litecore-ubuntu2204-${LITECORE_VERSION}"
+DEVICEFARM_URL="https://soc-developer.semiconductor.samsung.com/api/v1/resource/download-file/devicefarmcli-${DEVICEFARM_CLI_VERSION}.zip"
 
 download_and_extract() {
   local download_url="$1"
