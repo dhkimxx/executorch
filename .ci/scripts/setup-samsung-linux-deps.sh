@@ -22,9 +22,16 @@ while [[ $# -gt 0 ]]; do
       if [[ "$(echo "$2" | tr '[:upper:]' '[:lower:]')" =~ ^(false|0|off|no)$ ]]; then
         export DEVICE_CONNECT_ENABLED=0
       fi
-      shift 2 ;;
+      shift 2
+      ;;
+    --no-device-connect|--skip-device-connect)
+      export DEVICE_CONNECT_ENABLED=0
+      shift
+      ;;
     *)
-      shift ;;
+      # Unkown option
+      shift
+      ;;
   esac
 done
 
