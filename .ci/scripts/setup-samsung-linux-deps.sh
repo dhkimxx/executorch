@@ -31,7 +31,7 @@ done
 
 LITECORE_VERSION="v1.0"
 DEVICEFARM_CLI_VERSION="stg-beta-v0.0.1"
-LITECORE_URL="https://soc-developer.semiconductor.samsung.com/api/v1/resource/download-file/ai-litecore-ubuntu2204-${LITECORE_VERSION}"
+LITECORE_URL="https://soc-developer.semiconductor.samsung.com/api/v1/resource/download-file/ai-litecore-ubuntu2204-${LITECORE_VERSION}.tar.gz"
 DEVICEFARM_URL="https://soc-developer.semiconductor.samsung.com/api/v1/resource/download-file/devicefarmcli-${DEVICEFARM_CLI_VERSION}.zip"
 
 download_and_extract() {
