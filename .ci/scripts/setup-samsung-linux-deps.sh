@@ -18,13 +18,7 @@ export DEVICE_CONNECT_ENABLED=1
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --device-connect)
-      if [[ "$(echo "$2" | tr '[:upper:]' '[:lower:]')" =~ ^(false|0|off|no)$ ]]; then
-        export DEVICE_CONNECT_ENABLED=0
-      fi
-      shift 2
-      ;;
-    --no-device-connect|--skip-device-connect)
+    --skip-device-connect)
       export DEVICE_CONNECT_ENABLED=0
       shift
       ;;
@@ -37,6 +31,8 @@ done
 
 LITECORE_URL="https://soc-developer.semiconductor.samsung.com/api/v1/resource/download-file/exynos-ai-litecore-ubuntu2204-v1.0.0"
 DEVICEFARM_URL="https://soc-developer.semiconductor.samsung.com/api/v1/resource/download-file/devicefarmcli-stg-beta-v0.0.1.zip"
+LITECORE_VERSION="1.0"
+DEVICEFARM_CLI_VERSION="beta-1.0.9"
 
 download_and_extract() {
   local download_url="$1"
@@ -71,7 +67,7 @@ download_and_extract() {
 }
 
 download_ai_lite_core() {
-  local litecore_version="${1:-1.0}"
+  local litecore_version="${1:-${LITECORE_VERSION}}"
   local litecore_out="/tmp/exynos-ai-litecore-v${litecore_version}.tar.gz"
   local litecore_dir="/tmp/exynos_ai_lite_core"
 
@@ -85,7 +81,7 @@ download_ai_lite_core() {
 }
 
 install_devicefarm_cli() {
-  local cli_version="${1:-beta-1.0.9}"
+  local cli_version="${1:-${DEVICEFARM_CLI_VERSION}}"
   local cli_out="/tmp/devicefarm-cli-v${cli_version}.zip"
   local cli_dir="/tmp/devicefarm_cli"
 
@@ -171,14 +167,11 @@ install_enn_backend() {
   export PYTHONPATH="${PYTHONPATH:-}:${EXECUTORCH_ROOT}/.."
 }
 
-litecore_ver="1.0"
-devicefarm_ver="beta-1.0.9"
-
-download_ai_lite_core ${litecore_ver}
+download_ai_lite_core ${LITECORE_VERSION}
 install_enn_backend
 
 if [[ "${DEVICE_CONNECT_ENABLED}" == "1" ]]; then
-  install_devicefarm_cli "${devicefarm_ver}"
+  install_devicefarm_cli "${DEVICEFARM_CLI_VERSION}"
   acquire_device
 else
   export DEVICE_ACQUIRED=0
